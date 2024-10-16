@@ -1,7 +1,6 @@
 import hid
 import crcmod
 import time
-import sys
 
 class Dp100:
     VID = 0x00
@@ -188,30 +187,19 @@ class Dp100:
         time.sleep(0.05)
         self.check_frame(self.device.read(64))
 
-    def set(self, output = False, vset = 0, iset = 0, ovp = 30500, ocp = 5050):
+    def set(self, output = -1, vset = -1, iset = -1, ovp = -1, ocp = -1):
+        self.basic_set()
+        time.sleep(0.1)
+        if output == -1:
+            output = self.state
+        if vset == -1:
+            vset = self.vo_set
+        if iset == -1:
+            iset = self.io_set
+        if ovp == -1:
+            ovp = self.ovp_set
+        if ocp == -1:
+            ocp = self.ocp_set
         self.device.write(self.gen_frame(self.OP_BASICSET, self.gen_set(output, vset, iset, ovp, ocp)))
         time.sleep(0.05)
         self.check_frame(self.device.read(64))
-
-if __name__ == '__main__':
-
-    try:
-        dp100 = Dp100()
-    except hid.HIDException:
-        print("Could not communicate to device")
-        sys.exit(1)
-
-    print(f"Device Manufacturer: {dp100.device.manufacturer}")
-    print(f"Device Serial: {dp100.device.serial}")
-
-    dp100.status()
-    dp100.device_info()
-    dp100.system_info()
-    dp100.basic_set()
-    vset_query = 5000
-    iset_query = 500
-    dp100.set(output=True, vset=vset_query, iset=iset_query)
-    while dp100.vout < vset_query - 100:
-        time.sleep(.2)
-        dp100.status()
-    dp100.set(output=False, vset=vset_query, iset=iset_query)
