@@ -184,8 +184,8 @@ class Dp100:
 
     def basic_set(self):
         self.device.write(self.gen_frame(self.OP_BASICSET, bytes([0x80])))
-        time.sleep(0.05)
         self.check_frame(self.device.read(64))
+        time.sleep(0.05)
 
     def set(self, output = -1, vset = -1, iset = -1, ovp = -1, ocp = -1):
         self.basic_set()
@@ -202,4 +202,3 @@ class Dp100:
             ocp = self.ocp_set
         self.device.write(self.gen_frame(self.OP_BASICSET, self.gen_set(output, vset, iset, ovp, ocp)))
         time.sleep(0.05)
-        self.check_frame(self.device.read(64))
